@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI-01 — Correlation Demo</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="header-left">
+      <h1><span class="accent-dot"></span>AI-01 — Autonomous Incident Resolution Engine</h1>
+    </div>
+    <p class="subtitle">CORRELATE → ROOT CAUSE → PRIORITY → REMEDIATION → HUMAN APPROVAL → AUDIT</p>
+  </header>
+
+  <main>
+    <section class="panel" id="alert-panel">
+      <h2>Raw Alert Feed <span id="alert-count"></span></h2>
+      <div id="alert-list"></div>
+    </section>
+
+    <section class="panel" id="result-panel">
+      <div class="result-header">
+        <h2>Correlated Incidents</h2>
+        <div class="result-actions">
+          <button id="analyze-btn">Analyze</button>
+          <button id="root-cause-btn" disabled>Find Root Cause</button>
+          <button id="priority-btn" disabled>Assign Priority</button>
+          <button id="remediation-btn" disabled>Propose Remediation</button>
+        </div>
+      </div>
+      <div class="decided-by-row">
+        <label for="decided-by-input">Deciding as</label>
+        <input id="decided-by-input" type="text" value="sre-oncall" />
+      </div>
+      <div id="cluster-list">
+        <p class="placeholder">Click "Analyze" to run the Correlate Agent on the alert feed.</p>
+      </div>
+    </section>
+  </main>
+
+  <section class="panel" id="audit-panel">
+    <h2>Audit Trail <span id="audit-count"></span></h2>
+    <div id="audit-list">
+      <p class="placeholder">No actions recorded yet.</p>
+    </div>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+</html>

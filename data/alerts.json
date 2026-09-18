@@ -1,0 +1,20 @@
+[
+  { "id": "AL-001", "service": "payments-db", "message": "Connection pool exhausted (98/100 in use)", "severity": "high", "timestamp": "2026-09-18T10:30:00Z" },
+  { "id": "AL-002", "service": "payments-db", "message": "Query latency p99 > 4000ms on orders table", "severity": "high", "timestamp": "2026-09-18T10:30:15Z" },
+  { "id": "AL-003", "service": "payments-api", "message": "5xx error rate spiked to 22% on /checkout", "severity": "high", "timestamp": "2026-09-18T10:30:40Z" },
+  { "id": "AL-004", "service": "payments-db", "message": "Replica lag exceeded 15s on read-replica-2", "severity": "medium", "timestamp": "2026-09-18T10:31:05Z" },
+  { "id": "AL-005", "service": "checkout-service", "message": "Timeout calling payments-api after 3000ms", "severity": "high", "timestamp": "2026-09-18T10:31:20Z" },
+
+  { "id": "AL-006", "service": "cdn-edge", "message": "Cache hit ratio dropped to 41% on edge-node-eu-3", "severity": "medium", "timestamp": "2026-09-18T10:35:00Z" },
+  { "id": "AL-007", "service": "cdn-edge", "message": "Origin fetch errors increased on static-assets bucket", "severity": "high", "timestamp": "2026-09-18T10:35:30Z" },
+  { "id": "AL-008", "service": "cdn-edge", "message": "TLS handshake failures on edge-node-eu-3 and eu-4", "severity": "high", "timestamp": "2026-09-18T10:36:00Z" },
+  { "id": "AL-009", "service": "frontend-web", "message": "Page load p95 increased to 6.2s for EU users", "severity": "medium", "timestamp": "2026-09-18T10:36:20Z" },
+
+  { "id": "AL-010", "service": "auth-service", "message": "Unusual spike in failed login attempts from single IP range", "severity": "high", "timestamp": "2026-09-18T10:40:00Z" },
+  { "id": "AL-011", "service": "auth-service", "message": "Token validation errors up 300% in last 5 minutes", "severity": "high", "timestamp": "2026-09-18T10:40:20Z" },
+  { "id": "AL-012", "service": "user-db", "message": "Suspicious bulk SELECT on users table from service-account-7", "severity": "high", "timestamp": "2026-09-18T10:40:45Z" },
+  { "id": "AL-013", "service": "auth-service", "message": "Session store (redis-auth) memory usage at 92%", "severity": "medium", "timestamp": "2026-09-18T10:41:00Z" },
+
+  { "id": "AL-014", "service": "notification-service", "message": "Queue depth increased to 1200 messages, workers idle", "severity": "low", "timestamp": "2026-09-18T10:45:00Z" },
+  { "id": "AL-015", "service": "batch-jobs", "message": "Nightly cleanup job finished 4 minutes later than usual", "severity": "low", "timestamp": "2026-09-18T10:50:00Z" }
+]
