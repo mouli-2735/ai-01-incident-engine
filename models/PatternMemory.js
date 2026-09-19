@@ -5,7 +5,22 @@ const DecisionSchema = new Schema(
     incident: { type: Schema.Types.ObjectId, ref: 'Incident' },
     decision: { type: String, enum: ['approved', 'rejected'] },
     decidedBy: { type: String },
+    decidedByType: { type: String, enum: ['human', 'system'], default: 'human' },
     note: { type: String },
+    at: { type: Date, default: Date.now },
+  },
+  { _id: false }
+);
+
+// A human (or the Root Cause escalation flow) correcting/supplying a
+// diagnosis. Tracked separately from approve/reject so "the system learns
+// from humans" covers diagnosis corrections too, not just recovery decisions.
+const DiagnosisCorrectionSchema = new Schema(
+  {
+    incident: { type: Schema.Types.ObjectId, ref: 'Incident' },
+    stage: { type: String, enum: ['root_cause', 'priority', 'recovery'] },
+    suggestion: { type: String },
+    submittedBy: { type: String },
     at: { type: Date, default: Date.now },
   },
   { _id: false }
@@ -27,12 +42,11 @@ const PatternMemorySchema = new Schema(
     lastApprovedAction: { type: String },
 
     history: { type: [DecisionSchema], default: [] },
+    diagnosisCorrections: { type: [DiagnosisCorrectionSchema], default: [] },
   },
   { timestamps: true }
 );
 
-// Confidence is advisory only. The system may *suggest* lighter oversight;
-// it never flips requiresApproval on its own.
 PatternMemorySchema.virtual('total').get(function () {
   return this.approvals + this.rejections;
 });
@@ -51,6 +65,7 @@ PatternMemorySchema.statics.record = async function ({
   label,
   decision,
   decidedBy,
+  decidedByType,
   note,
   incidentId,
   action,
@@ -66,7 +81,38 @@ PatternMemorySchema.statics.record = async function ({
       ...(decision === 'approved' && action ? { lastApprovedAction: action } : {}),
     },
     $push: {
-      history: { incident: incidentId, decision, decidedBy, note, at: new Date() },
+      history: {
+        incident: incidentId,
+        decision,
+        decidedBy,
+        decidedByType: decidedByType || 'human',
+        note,
+        at: new Date(),
+      },
+    },
+  };
+
+  return this.findOneAndUpdate({ patternKey }, update, {
+    new: true,
+    upsert: true,
+    setDefaultsOnInsert: true,
+  });
+};
+
+// Log a human diagnosis correction (escalation resolution). Does not touch
+// approvals/rejections — this is a separate learning signal.
+PatternMemorySchema.statics.recordDiagnosis = async function ({
+  patternKey,
+  label,
+  stage,
+  suggestion,
+  submittedBy,
+  incidentId,
+}) {
+  const update = {
+    $set: { ...(label ? { label } : {}) },
+    $push: {
+      diagnosisCorrections: { incident: incidentId, stage, suggestion, submittedBy, at: new Date() },
     },
   };
 

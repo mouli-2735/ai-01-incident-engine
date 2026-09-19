@@ -2,18 +2,33 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>AI-01 — Correlation Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI-01 — Autonomous Incident Resolution Engine</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header>
     <div class="header-left">
       <h1><span class="accent-dot"></span>AI-01 — Autonomous Incident Resolution Engine</h1>
+      <p class="subtitle">CORRELATE → ROOT CAUSE → PRIORITY → RECOVERY → APPROVAL → AUDIT</p>
     </div>
-    <p class="subtitle">CORRELATE → ROOT CAUSE → PRIORITY → REMEDIATION → HUMAN APPROVAL → AUDIT</p>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="incidents">Incidents</button>
+      <button class="tab-btn" data-tab="patterns">Pattern Memory</button>
+    </div>
   </header>
 
-  <main>
+  <div class="summary-strip" id="summary-strip">
+    <span class="sc sc-p1"><span class="dot"></span><span id="count-p1">0</span> P1</span>
+    <span class="divider">·</span>
+    <span class="sc sc-p2"><span class="dot"></span><span id="count-p2">0</span> P2</span>
+    <span class="divider">·</span>
+    <span class="sc sc-p3"><span class="dot"></span><span id="count-p3">0</span> P3</span>
+    <span class="divider">·</span>
+    <span class="sc sc-esc"><span class="dot"></span><span id="count-esc">0</span> escalated</span>
+  </div>
+
+  <main id="incidents-view">
     <section class="panel" id="alert-panel">
       <h2>Raw Alert Feed <span id="alert-count"></span></h2>
       <div id="alert-list"></div>
@@ -21,23 +36,49 @@
 
     <section class="panel" id="result-panel">
       <div class="result-header">
-        <h2>Correlated Incidents</h2>
-        <div class="result-actions">
-          <button id="analyze-btn">Analyze</button>
-          <button id="root-cause-btn" disabled>Find Root Cause</button>
-          <button id="priority-btn" disabled>Assign Priority</button>
-          <button id="remediation-btn" disabled>Propose Remediation</button>
+        <h2>Incidents</h2>
+
+        <!-- Status dock: lives in the top-right corner, each chip opens its list -->
+        <div class="status-dock" id="status-dock" role="group" aria-label="Incident lists by status">
+          <button type="button" class="dock-chip" data-group="waiting" aria-haspopup="true" aria-expanded="false" aria-controls="dock-popover">
+            <span class="dock-dot dock-dot-waiting"></span>Waiting<span class="dock-count" id="dock-count-waiting">0</span>
+          </button>
+          <button type="button" class="dock-chip" data-group="approved" aria-haspopup="true" aria-expanded="false" aria-controls="dock-popover">
+            <span class="dock-dot dock-dot-approved"></span>Approved<span class="dock-count" id="dock-count-approved">0</span>
+          </button>
+          <button type="button" class="dock-chip" data-group="resolved" aria-haspopup="true" aria-expanded="false" aria-controls="dock-popover">
+            <span class="dock-dot dock-dot-resolved"></span>Resolved<span class="dock-count" id="dock-count-resolved">0</span>
+          </button>
+          <button type="button" class="dock-chip" data-group="rejected" aria-haspopup="true" aria-expanded="false" aria-controls="dock-popover">
+            <span class="dock-dot dock-dot-rejected"></span>Rejected<span class="dock-count" id="dock-count-rejected">0</span>
+          </button>
+          <div class="dock-popover" id="dock-popover" role="region" aria-label="Incident list" hidden></div>
         </div>
       </div>
-      <div class="decided-by-row">
-        <label for="decided-by-input">Deciding as</label>
-        <input id="decided-by-input" type="text" value="sre-oncall" />
-      </div>
-      <div id="cluster-list">
-        <p class="placeholder">Click "Analyze" to run the Correlate Agent on the alert feed.</p>
+
+      <!-- Everything below is centered: controls, assessment, incident cards -->
+      <div class="result-body">
+        <div class="analyze-bar">
+          <div class="decided-by-row">
+            <label for="decided-by-input">Deciding as</label>
+            <input id="decided-by-input" type="text" value="sre-oncall" />
+          </div>
+          <button id="analyze-btn">Analyze</button>
+        </div>
+
+        <div id="cluster-list">
+          <div class="empty-state">Click "Analyze" to correlate the alert feed. Root Cause and Priority will chain automatically wherever confidence stays high; Recovery always needs a decision unless it clears the high-trust auto-run bar.</div>
+        </div>
       </div>
     </section>
   </main>
+
+  <section class="panel" id="pattern-view">
+    <h2>Pattern Memory <span id="pattern-count"></span></h2>
+    <div id="pattern-grid" class="pattern-grid">
+      <p class="placeholder">No patterns recorded yet — decisions made during Recovery approval build this up over time.</p>
+    </div>
+  </section>
 
   <section class="panel" id="audit-panel">
     <h2>Audit Trail <span id="audit-count"></span></h2>
